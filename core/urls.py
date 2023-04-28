@@ -17,7 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from backend.views import HelloWorld
+from store_owners.views import register_store_owner
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', HelloWorld.as_view(), name='hello'),
+    path('register/', register_store_owner, name='register_store_owner'),
+    
+    
 ]
