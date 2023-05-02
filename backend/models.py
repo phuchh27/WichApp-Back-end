@@ -21,13 +21,15 @@ class MyUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class StoreOwners(AbstractBaseUser):
+    username = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
-    name = models.CharField(max_length=255)
+    firstname = models.CharField(max_length=255)
+    lastname = models.CharField(max_length=255)
     date_of_birth = models.DateField()
-    is_active = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    USERNAME_FIELD = 'email'
 
     objects = MyUserManager()
 
