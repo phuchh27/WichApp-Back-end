@@ -1,3 +1,4 @@
 django
 djangorestframework-3.14.0
 psycopg2-2.9.6
+simplejwt
