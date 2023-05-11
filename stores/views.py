@@ -4,6 +4,8 @@ from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView ,RetrieveUpdateDestroyAPIView
 from rest_framework import permissions
 
+from items.views import ItemListCreateAPIView
+
 from .serializers import StoreSerializer
 from .models import Store
 from .permissions import IsOwner
@@ -24,7 +26,6 @@ class StoreDetailAPIView(RetrieveUpdateDestroyAPIView):
     permission = (permissions.IsAuthenticated,IsOwner,)
     queryset = Store.objects.all()
     lookup_field = "id"
-    
     def get_queryset(self):
-        return self.queryset.filter(owner=self.request.user)
-      
+        return self.queryset.filter(owner=self.request.user)  
+     
