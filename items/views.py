@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView
 
@@ -16,9 +16,12 @@ class ItemListCreateAPIView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         store_id = self.kwargs.get('store_id')
-        #user_id = self.request.user.id
-        serializer.save(store_id=store_id)
-
+        store = get_object_or_404(Store, id=store_id)
+        if store.owner != self.request.user:
+            return HttpResponseBadRequest('Invalid user')
+        else:
+            serializer.save(store_id=store_id)
+            return JsonResponse({'message': 'Item created successfully'})
     def get_queryset(self):
         store_id = self.kwargs.get('store_id')
         store = get_object_or_404(Store, id=store_id)
