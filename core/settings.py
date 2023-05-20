@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'authentication',
     'stores',
     'items',
+    'staffs'
 ]
 
 SWAGGER_SETTINGS ={
