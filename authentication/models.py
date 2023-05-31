@@ -6,12 +6,12 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,Permis
 
 from rest_framework_simplejwt.tokens import RefreshToken
 class UserManager(BaseUserManager):
-    def create_user(self,username,email,password=None):
+    def create_user(self,username,email,password=None,phone=None):
         if username is None:
             raise TypeError('username must not be none')
         if email is None:
             raise TypeError('email must not be None')
-        user=self.model(username=username, email=self.normalize_email(email))
+        user=self.model(username=username, email=self.normalize_email(email), phone=phone)
         user.set_password(password)
         user.save()
         return user
@@ -27,9 +27,13 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser,PermissionsMixin):
     username=models.CharField(max_length=255,unique=True, db_index=True)
     email=models.EmailField(max_length=255,unique=True, db_index=True)
+    address =  models.CharField(max_length=255, null=True)
+    phone =  models.CharField(max_length=255, null=True,unique=True)
+    fullname = models.CharField(max_length=255)
     is_verified=models.BooleanField(default=False)
     is_active=models.BooleanField(default=True)
-    is_staff=models.BooleanField(default=False)
+    is_staff=models.BooleanField(default=True)
+    is_owner=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     
@@ -47,3 +51,4 @@ class User(AbstractBaseUser,PermissionsMixin):
             'refresh':str(refresh),
             'access': str(refresh.access_token),
         }
+        
