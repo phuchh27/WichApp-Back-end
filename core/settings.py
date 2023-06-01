@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'stores',
     'items',
     'staff',
+    'WorkSchedule',
 ]
 
 SWAGGER_SETTINGS ={
