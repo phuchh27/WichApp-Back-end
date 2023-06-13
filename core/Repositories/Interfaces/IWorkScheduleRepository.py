@@ -13,3 +13,5 @@ class WorkScheduleRepository(ABC):
     
     def get_detail_schedules_by_store_id(self, store_id: int)-> None:
         pass
+    
+    

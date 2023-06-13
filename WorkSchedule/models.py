@@ -22,15 +22,14 @@ class S_WorkSchedule (models.Model):
     shift = models.CharField(max_length=20)
     description = models.TextField(max_length=50)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    store = models.ForeignKey(Store, on_delete=models.CASCADE)
-    
-    class Meta:
-        ordering = ['work_day', 'shift']
+    work_schedule = models.ForeignKey(WorkSchedule, on_delete=models.CASCADE)
 
 class O_WorkSchedule (models.Model):
+    week_day = models.CharField(max_length=20)
     work_day = models.DateField()
     shift = models.CharField(max_length=20)
     description = models.TextField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    store = models.ForeignKey(Store, on_delete=models.CASCADE) 
+    staff_name = models.CharField(max_length=50)
+    work_schedule = models.ForeignKey(WorkSchedule, on_delete=models.CASCADE)
+    s_work_schedule = models.ForeignKey(S_WorkSchedule, on_delete=models.CASCADE)
     
