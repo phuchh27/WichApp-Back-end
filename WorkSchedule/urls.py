@@ -1,0 +1,69 @@
+from django.urls import path
+
+from WorkSchedule.views import (
+    DaysOfWeekView,
+    StaffCreateWorkScheduleView,
+    work_schedule_create_view,
+    work_schedule_list_view,
+    work_schedule_detail_view,
+    staff_work_schedule_list_view,
+    staff_work_schedule_update_view,
+    staff_work_schedule_delete_view,
+    owner_work_schedule_list_view,
+    owner_create_ws_f_week,
+    owner_delete_ws_f_week,
+)
+
+urlpatterns = [
+    path(
+        "<int:store_id>/work-schedules/",
+        work_schedule_create_view,
+        name="work-schedule",
+    ),
+    path(
+        "<int:store_id>/work-schedule-list/",
+        work_schedule_list_view,
+        name="work-schedule-list",
+    ),
+    path(
+        "<int:store_id>/work-schedule-list/<int:schedule_id>/",
+        work_schedule_detail_view,
+        name="owner-detail",
+    ),
+     path(
+        "<int:store_id>/owner-work-schedule-detail/<int:schedule_id>/",
+        owner_work_schedule_list_view,
+        name="owner-list",
+    ),
+    path(
+        "<int:store_id>/staff-work-schedule-detail/<int:schedule_id>/",
+        staff_work_schedule_list_view,
+        name="staff-list",
+    ),
+    path(
+        "<int:store_id>/create/<int:schedule_id>/<int:s_schedule_id>",
+        owner_create_ws_f_week,
+        name="owner-create",
+    ),
+    path(
+        "<int:store_id>/work-schedule-list/<int:schedule_id>/schedule-for-staff",
+        StaffCreateWorkScheduleView.as_view(),
+        name="staff-create",
+    ),
+    path("days-of-week/", DaysOfWeekView.as_view(), name="days_of_week"),
+    path(
+        "<int:store_id>/work-schedule-update/<int:id>",
+        staff_work_schedule_update_view,
+        name="update",
+    ),
+    path(
+        "<int:store_id>/work-schedule-delete/<int:id>",
+        staff_work_schedule_delete_view,
+        name="delete",
+    ),
+    path(
+        "<int:store_id>/owner-delete/<int:id>",
+        owner_delete_ws_f_week,
+        name="delete",
+    ),
+]

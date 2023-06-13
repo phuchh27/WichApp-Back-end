@@ -42,7 +42,21 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'authentication',
+    'stores',
+    'items',
+    'staff',
+    'WorkSchedule',
 ]
+
+SWAGGER_SETTINGS ={
+    'SECURITY_DEFINITIONS':{
+        "Bearer":{
+            'type':'apiKey',
+            'name':'Authorization',
+            'in':'header'
+        }
+    }
+}
 
 REST_FRAMEWORK = {
      'NON_FIELD_ERRORS_KEY': 'error',
@@ -97,10 +111,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'shopwise',
+        'USER': 'shopwise',
+        'PASSWORD': '123456',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
