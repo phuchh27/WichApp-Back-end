@@ -1,6 +1,6 @@
 
 from django.db import models
-
+from rest_framework_simplejwt.settings import api_settings
 # Create your models here.
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,PermissionsMixin)
 
@@ -50,5 +50,6 @@ class User(AbstractBaseUser,PermissionsMixin):
         return {
             'refresh':str(refresh),
             'access': str(refresh.access_token),
+            'expiresIn': int(api_settings.ACCESS_TOKEN_LIFETIME.total_seconds()),
         }
         

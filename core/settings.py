@@ -10,8 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import datetime
 import os
 from pathlib import Path
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +68,11 @@ REST_FRAMEWORK = {
     ),
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -112,9 +120,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'shopwise',
-        'USER': 'shopwise',
-        'PASSWORD': '123456',
+        'NAME': 'wichdb',
+        'USER': 'wich',
+        'PASSWORD': 'wich',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -161,8 +169,8 @@ STATIC_URL = 'static/'
 # SMTP Mail service with decouple
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = "shopwise0710.ma@gmail.com" #os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = "jlucjpkerfnmxdqb" #os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = "wichapp227.sv@gmail.com" #os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = "wilnbbmxjediwxqb" #os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

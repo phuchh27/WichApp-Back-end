@@ -15,6 +15,7 @@ from .utils import Util
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from urllib.parse import unquote
 # Create your views here.
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -49,6 +50,7 @@ class verifyEmail(views.APIView):
     )
     def get (self,request):
         token = request.GET.get('token')
+        token = unquote(token)
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
             user = User.objects.get(id=payload['user_id'])
