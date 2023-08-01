@@ -36,10 +36,13 @@ class LoginSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=255, min_length=3, read_only=True)
     tokens = serializers.CharField(max_length=68, min_length=6,read_only=True)
     expiresIn = serializers.IntegerField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
+    is_staff = serializers.BooleanField(read_only=True)
+    is_owner = serializers.BooleanField(read_only=True)
     
     class Meta:
         model = User
-        fields = ['email','password','username','tokens','id', 'expiresIn']
+        fields = ['email','password','username','tokens','id', 'expiresIn', 'is_staff','is_owner']
         
     def get_expiresIn(self):
         return int(api_settings.ACCESS_TOKEN_LIFETIME.total_seconds())
@@ -60,7 +63,10 @@ class LoginSerializer(serializers.ModelSerializer):
             'email':user.email,
             'username':user.username,
             'tokens':user.tokens,
-            'expiresIn':self.get_expiresIn()
+            'expiresIn':self.get_expiresIn(),
+            'is_staff':user.is_staff,
+            'is_owner':user.is_owner
+
         }
         
         return super().validate(attrs)

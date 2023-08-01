@@ -1,4 +1,5 @@
 # API documentation
+myenv\scripts\activate
 
 ## Auth API 
 
