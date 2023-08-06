@@ -1,5 +1,6 @@
 # API documentation
 myenv\scripts\activate
+python manage.py runserver
 
 ## Auth API 
 
