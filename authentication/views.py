@@ -9,12 +9,14 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 import jwt
 #import inside project
-from .serializers import RegisterSerializer , EmailVerificationSerializer ,LoginSerializer
+from .serializers import RegisterSerializer , EmailVerificationSerializer ,LoginSerializer,LogoutSerializer
 from.models import User
 from .utils import Util
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from urllib.parse import unquote
+from rest_framework import permissions
 # Create your views here.
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -49,6 +51,7 @@ class verifyEmail(views.APIView):
     )
     def get (self,request):
         token = request.GET.get('token')
+        token = unquote(token)
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
             user = User.objects.get(id=payload['user_id'])
@@ -68,4 +71,12 @@ class LoginAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+class LogOutAPIView(generics.GenericAPIView):
+    serializer_class = LogoutSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    def post(self, request):
+        serializer = self.serializer_class(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)

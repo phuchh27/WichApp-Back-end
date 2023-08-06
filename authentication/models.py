@@ -50,5 +50,6 @@ class User(AbstractBaseUser,PermissionsMixin):
         return {
             'refresh':str(refresh),
             'access': str(refresh.access_token),
+            
         }
         
