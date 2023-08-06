@@ -17,6 +17,7 @@ class Store(models.Model):
     address = models.CharField(max_length=255)
     is_active = models.BooleanField(default= True)
     created_at = models.DateTimeField(auto_now_add=True)
+    image_url = models.FileField(upload_to='store_images', blank=True, null=True)
     owner = models.ForeignKey(to=User,on_delete=models.CASCADE)
     
     
