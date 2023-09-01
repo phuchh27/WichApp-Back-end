@@ -36,7 +36,7 @@ class StoresAPIView(CreateAPIView):
             return Response({"detail": "You do not have permission to create a store."}, status=status.HTTP_403_FORBIDDEN)
         if count_of_stores >= 1:
             return Response(
-                {"detail": "You already have a store. You need to pay a cost to create a new store."},
+                {"detail": "You already have a store. You need to pay a cost to create a new store.", "status": 402},
                 status=status.HTTP_402_PAYMENT_REQUIRED
             )
         else:
