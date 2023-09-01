@@ -14,7 +14,8 @@ import datetime
 import os
 from pathlib import Path
 from datetime import timedelta
-
+from decouple import config
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-yrj0ueg$4#onp7sx*781sb#y_fx7h-_ug^q_j4hw&@d8geb+ej'
+
+
+with open('stripe_keys.json') as stripe_keys_file:
+    stripe_keys = json.load(stripe_keys_file)
+
+STRIPE_PUBLISHABLE_KEY = stripe_keys['STRIPE_PUBLISHABLE_KEY']
+STRIPE_SECRET_KEY = stripe_keys['STRIPE_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,6 +60,7 @@ INSTALLED_APPS = [
     'WorkSchedule',
     'corsheaders',
     'storages',
+    'payment',
 ]
 
 SWAGGER_SETTINGS ={

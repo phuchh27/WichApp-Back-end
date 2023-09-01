@@ -10,6 +10,8 @@ from rest_framework import status
 from .serializers import StoreSerializer, categoriesSerializer
 from .models import Category, Store
 
+from payment.services import create_payment_session
+
 # Create store views
 class storeListAPIView(ListAPIView):
     serializer_class = StoreSerializer
@@ -35,8 +37,9 @@ class StoresAPIView(CreateAPIView):
         elif self.request.user.is_staff:
             return Response({"detail": "You do not have permission to create a store."}, status=status.HTTP_403_FORBIDDEN)
         if count_of_stores >= 1:
+            payment_link = create_payment_session(self.request.user)
             return Response(
-                {"detail": "You already have a store. You need to pay a cost to create a new store.", "status": 402},
+                {"detail": "You already have a store. You need to pay a cost to create a new store.", "status": 402,"payment_link": payment_link},
                 status=status.HTTP_402_PAYMENT_REQUIRED
             )
         else:
