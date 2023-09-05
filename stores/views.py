@@ -7,10 +7,10 @@ from rest_framework.response import Response
 from items.views import ItemListCreateAPIView
 from rest_framework import status
 
-from .serializers import StoreSerializer, categoriesSerializer
+from .serializers import StoreSerializer, categoriesSerializer , StorePaidSerializer
 from .models import Category, Store
 
-from payment.services import create_payment_session
+from payment.services import create_payment_session , verify_payment_session
 
 # Create store views
 class storeListAPIView(ListAPIView):
@@ -48,7 +48,7 @@ class StoresAPIView(CreateAPIView):
 
 
 class StoresPayAPIView(CreateAPIView):
-    serializer_class = StoreSerializer
+    serializer_class = StorePaidSerializer
     queryset = Store.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     
@@ -56,14 +56,21 @@ class StoresPayAPIView(CreateAPIView):
         # Chỉ trả về các cửa hàng của người dùng đăng nhập
         return self.queryset.filter(owner=self.request.user)
 
-    def perform_create(self, serializer):
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.serializer_class(data=request.data)
         # Gán owner là người dùng đăng nhập
         if not self.request.user.is_authenticated:
             return Response({"detail": "Authentication credentials were not provided."}, status=403)
         elif self.request.user.is_staff:
             return Response({"detail": "You do not have permission to create a store."}, status=403)
         else:
-            serializer.save(owner=self.request.user)
+            user = request.user
+            sesion_id = request.data.get("verify_code",None)
+            verify_payment = verify_payment_session(session_id=sesion_id, user=user)
+            if not verify_payment:
+                return Response({"detail": "Payment session is invalid."}, status=402)
+            serializer.save(owner=request.user)
             return Response({"detail": "Store created successfully."}, status=201)
 
 class StoreDetailAPIView(RetrieveUpdateDestroyAPIView):

@@ -17,6 +17,8 @@ from datetime import timedelta
 from decouple import config
 import json
 
+import stripe
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,6 +35,8 @@ with open('stripe_keys.json') as stripe_keys_file:
 
 STRIPE_PUBLISHABLE_KEY = stripe_keys['STRIPE_PUBLISHABLE_KEY']
 STRIPE_SECRET_KEY = stripe_keys['STRIPE_SECRET_KEY']
+
+stripe.api_key = STRIPE_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
