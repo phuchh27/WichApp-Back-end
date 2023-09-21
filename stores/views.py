@@ -10,7 +10,7 @@ from rest_framework import status
 from .serializers import StoreSerializer, categoriesSerializer , StorePaidSerializer
 from .models import Category, Store
 
-from payment.services import create_payment_session , verify_payment_session
+from payment.services import create_payment_session , block_session
 
 # Create store views
 class storeListAPIView(ListAPIView):
@@ -40,7 +40,7 @@ class StoresAPIView(CreateAPIView):
             payment_link = create_payment_session(self.request.user)
             return Response(
                 {"detail": "You already have a store. You need to pay a cost to create a new store.", "status": 402,"payment_link": payment_link},
-                status=status.HTTP_402_PAYMENT_REQUIRED
+                status=status.HTTP_200_OK
             )
         else:
             serializer.save(owner=self.request.user)
@@ -56,22 +56,21 @@ class StoresPayAPIView(CreateAPIView):
         # Chỉ trả về các cửa hàng của người dùng đăng nhập
         return self.queryset.filter(owner=self.request.user)
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
 
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={'request': request})
         # Gán owner là người dùng đăng nhập
         if not self.request.user.is_authenticated:
             return Response({"detail": "Authentication credentials were not provided."}, status=403)
         elif self.request.user.is_staff:
             return Response({"detail": "You do not have permission to create a store."}, status=403)
-        else:
-            user = request.user
-            sesion_id = request.data.get("verify_code",None)
-            verify_payment = verify_payment_session(session_id=sesion_id, user=user)
-            if not verify_payment:
-                return Response({"detail": "Payment session is invalid."}, status=402)
-            serializer.save(owner=request.user)
+        
+        if serializer.is_valid():
+            serializer.validated_data['owner'] = request.user
+            self.perform_create(serializer)
+            block_session(serializer.validated_data['session_id'])
             return Response({"detail": "Store created successfully."}, status=201)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class StoreDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = StoreSerializer

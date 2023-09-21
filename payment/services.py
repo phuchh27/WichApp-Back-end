@@ -12,7 +12,7 @@ def create_payment_session(user):
             "quantity": 1,
         }],
         mode="payment",
-        success_url="http://localhost:4200/ohome/store?session_id={{CHECKOUT_SESSION_ID}}",
+        success_url="http://localhost:4200/payment?session_id={{CHECKOUT_SESSION_ID}}",
         cancel_url="http://localhost:4200/payment",
     )
     # payment_intent_id = session.payment_intent
@@ -24,13 +24,26 @@ def create_payment_session(user):
 #create function verify session_id and user from data base with session_id and user request if have session_id return true if not return false.
 
 def verify_payment_session(session_id, user):
-    # Verify the payment session
-    # You can customize the payment session as needed
-    session = stripe.checkout.Session.retrieve(session_id)
-    if session.customer_email == user.email:
-        return True
-    else:
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+        payment_status = PaymentSession.objects.get(session_id=session_id)
+        if session.customer_email == user.email and payment_status.status == True:
+            return True
+        else:
+            return False
+    except:
         return False
+    
+def block_session(session_id):
+    try:
+        payment_session = PaymentSession.objects.get(session_id=session_id)
+
+        payment_session.status = False
+        payment_session.save()
+
+    except PaymentSession.DoesNotExist:
+        pass 
+
 
 
 

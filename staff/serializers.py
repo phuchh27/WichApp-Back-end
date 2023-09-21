@@ -41,3 +41,9 @@ class RegisterStaffSerializer(serializers.ModelSerializer):
         except Store.DoesNotExist:
             pass
         return user
+
+
+class StaffsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email','phone','is_active')
