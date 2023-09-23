@@ -37,7 +37,6 @@ def verify_payment_session(session_id, user):
 def block_session(session_id):
     try:
         payment_session = PaymentSession.objects.get(session_id=session_id)
-
         payment_session.status = False
         payment_session.save()
 

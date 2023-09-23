@@ -68,7 +68,7 @@ class StoresPayAPIView(CreateAPIView):
         if serializer.is_valid():
             serializer.validated_data['owner'] = request.user
             self.perform_create(serializer)
-            block_session(serializer.validated_data['session_id'])
+            # block_session(serializer.validated_data['verify_code'])
             return Response({"detail": "Store created successfully."}, status=201)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
