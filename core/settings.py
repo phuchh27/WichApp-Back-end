@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'storages',
     'payment',
+    'utils',
 ]
 
 SWAGGER_SETTINGS ={
@@ -201,12 +202,17 @@ DEFAULT_TO_EMAIL = EMAIL_HOST_USER
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-AWS_S3_ACCESS_KEY_ID = 'AKIAXPDVX6FHTOUVWMVN'
+MEDIA_URL = '/media/'
 
-AWS_S3_SECRET_ACCESS_KEY = 'R5VqpZqKg95OTc9IaZyp6CFmDPRtty6V83ki752N'
 
-AWS_STORAGE_BUCKET_NAME = 'wichappimagestorage'
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_QUERYSTRING_AUTH = False
+# AWS_S3_ACCESS_KEY_ID = 'AKIAXPDVX6FHTOUVWMVN'
+
+# AWS_S3_SECRET_ACCESS_KEY = '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'
+
+# AWS_STORAGE_BUCKET_NAME = 'wichappimagestorage'
+
+# AWS_QUERYSTRING_AUTH = False

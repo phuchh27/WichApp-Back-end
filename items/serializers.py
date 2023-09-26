@@ -4,10 +4,10 @@ from rest_framework import serializers
 from stores.models import Store
 from .models import Item
 class ItemSerializer(serializers.ModelSerializer):
-    
+    image = serializers.ImageField(write_only=True)
     class Meta:
         model = Item
-        fields = ['id','name', 'description','cost','price','quantity']
+        fields = ['id','name','code','description','cost','price','quantity','image']
     def validate(self, attrs):
         store_id = self.context['view'].kwargs.get('store_id')
         store = get_object_or_404(Store, id=store_id)
