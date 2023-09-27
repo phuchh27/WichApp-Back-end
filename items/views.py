@@ -10,6 +10,10 @@ from .serializers import ItemSerializer
 from rest_framework.generics import ListCreateAPIView
 from rest_framework import status
 from utils.cloudinary import Cloudinary
+import base64
+from io import BytesIO
+from PIL import Image
+from django.core.files.base import ContentFile
 
 
 class ItemListCreateAPIView(ListCreateAPIView):
@@ -19,13 +23,26 @@ class ItemListCreateAPIView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         store_id = self.kwargs.get('store_id')
-        image = self.request.data['image']
+        image_base64 = self.request.data['image']
         serializer.validated_data.pop('image')
         name = self.request.data['name']
         code = self.request.data['code']
         cloudinary_service = Cloudinary()
-        image_url = cloudinary_service.upload_image(image, name, code)
-        serializer.save(store_id=store_id, image_link=image_url)
+        # print(image_base64)
+        if image_base64:
+            format,imgstr = image_base64.split(';base64,')
+            ext = format.split('/')[-1]
+
+            image_data = base64.b64decode(imgstr)
+
+            # image = Image.open(BytesIO(image_data))
+
+            image_url = cloudinary_service.upload_image(image_data, name, code)
+            print(image_url, ' ok')
+            serializer.save(store_id=store_id, image_link=image_url)
+        else:
+            image_url = 'https://res.cloudinary.com/dm4renyes/image/upload/v1695789028/empty-img_xqrhau.png'
+            serializer.save(store_id=store_id, image_link=image_url)
     
     def get_queryset(self):
         store_id = self.kwargs.get('store_id')
