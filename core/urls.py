@@ -46,4 +46,5 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     # path('webhooks/', include('payment.urls')),
     path('items/', include('items.urls')),
+    path('bills/', include('bill.urls')),
 ]

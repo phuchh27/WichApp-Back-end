@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'payment',
     'utils',
     'channels',
+    'django_redis',
+    'bill',
 ]
 
 SWAGGER_SETTINGS ={
@@ -89,6 +91,16 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/1", 
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
 }
 
 MIDDLEWARE = [
