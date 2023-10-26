@@ -47,3 +47,6 @@ class StaffsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email','phone','is_active')
+
+class StoreIdSerializer(serializers.Serializer):
+    store_id = serializers.IntegerField()

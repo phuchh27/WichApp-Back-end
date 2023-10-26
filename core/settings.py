@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'storages',
     'payment',
     'utils',
+    'channels',
 ]
 
 SWAGGER_SETTINGS ={
@@ -186,6 +187,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 STATIC_URL = 'static/'
 
+
 # SMTP Mail service with decouple
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = "smtp.gmail.com"
@@ -216,3 +218,5 @@ MEDIA_URL = '/media/'
 # AWS_STORAGE_BUCKET_NAME = 'wichappimagestorage'
 
 # AWS_QUERYSTRING_AUTH = False
+
+ASGI_APPLICATION = 'shopwise.asgi.application'

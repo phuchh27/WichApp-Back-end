@@ -6,7 +6,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from items import permissions
 from stores.models import Store
 from .models import Item, ItemCategory
-from .serializers import ItemCategorySerializer, ItemSerializer, SelectItemByCategorySerializer
+from .serializers import ItemCategorySerializer, ItemSerializer, SelectItemByCategorySerializer,ItemSocketSerializer
 from rest_framework.generics import ListCreateAPIView
 from rest_framework import status
 from utils.cloudinary import Cloudinary
@@ -85,3 +85,11 @@ class SelectItemByCategoryAPIView(ListAPIView):
         category_id = self.kwargs['category_id']
         queryset = Item.objects.filter(store_id=store_id, category_id=category_id)
         return queryset
+    
+
+class GetItemsByStoreId(ListAPIView):
+    serializer_class = ItemSocketSerializer
+
+    def get_queryset(self):
+        store_id = self.kwargs['store_id']
+        return Item.objects.filter(store_id=store_id)
