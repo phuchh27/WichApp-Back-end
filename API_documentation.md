@@ -1,6 +1,8 @@
 # API documentation
 myenv\scripts\activate
 python manage.py runserver
+daphne core.asgi:application
+
 
 ## Auth API 
 

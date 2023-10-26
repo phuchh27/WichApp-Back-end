@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from stores.models import Store
 from .models import Item , ItemCategory
+
 class ItemSerializer(serializers.ModelSerializer):
     image = serializers.CharField(write_only=True, required=False)
     class Meta:
@@ -31,3 +32,9 @@ class SelectItemByCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id','name','code','description','cost','price','quantity','image_link']
+
+
+class ItemSocketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = '__all__'

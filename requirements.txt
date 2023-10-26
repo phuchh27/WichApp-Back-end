@@ -2,3 +2,4 @@ django
 psycopg2-2.9.6
 simplejwt
 drf-yasg
+Django-4.2.6

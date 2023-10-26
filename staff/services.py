@@ -13,3 +13,9 @@ def staff_info_list(user_ids):
     data = list(users)
     print(data)
     return JsonResponse(data, safe=False)
+
+def get_store_id(id):
+
+    storeId = Staff.objects.get(user_id=id).store_id
+
+    return JsonResponse(storeId, safe=False)
