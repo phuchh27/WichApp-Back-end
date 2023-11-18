@@ -19,3 +19,9 @@ def get_store_id(id):
     storeId = Staff.objects.get(user_id=id).store_id
 
     return JsonResponse(storeId, safe=False)
+
+class StaffService:
+    @staticmethod
+    def get_staff_by_store_ids(store_ids):
+        staff = Staff.objects.filter(store_id__in=store_ids)
+        return staff

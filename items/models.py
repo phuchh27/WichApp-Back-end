@@ -17,3 +17,14 @@ class Item(models.Model):
     image_link = models.CharField(max_length=255,blank=True)
     store = models.ForeignKey(to=Store,on_delete=models.CASCADE)
     category = models.ForeignKey(to=ItemCategory,on_delete=models.CASCADE)
+    is_block = models.BooleanField(default=False)
+
+    def delete(self, *args, **kwargs):
+            self.is_block = True
+            self.save()
+
+    class Meta:
+            default_manager_name = 'objects'
+            indexes = [
+                models.Index(fields=['is_block']),
+            ]

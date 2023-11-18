@@ -19,7 +19,7 @@ class storeListAPIView(ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Chỉ trị về các cửa hàng của nguồn ĳng nhỏ
+       
         return self.queryset.filter(owner=self.request.user)
     
 class StoresAPIView(CreateAPIView):

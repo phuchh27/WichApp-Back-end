@@ -27,3 +27,11 @@ def get_product_quntity(product_id):
         return item_instance.quantity
     except Item.DoesNotExist:
         return None
+class UserService:
+    @staticmethod
+    def get_user_by_id(user_id):
+        try:
+            user = User.objects.get(pk=user_id)
+            return user
+        except User.DoesNotExist:
+            return None

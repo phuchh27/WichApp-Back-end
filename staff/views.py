@@ -4,11 +4,12 @@ from rest_framework import generics, serializers, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from authentication.models import User
+from authentication.services import UserService
 from staff.models import Staff
-from staff.services import list_staff, staff_info_list
+from staff.services import StaffService, list_staff, staff_info_list
 from stores.models import Store
-from stores.services import check_owmer
-from .serializers import RegisterStaffSerializer, StaffsSerializer, StoreIdSerializer
+from stores.services import StoreService, check_owmer
+from .serializers import GetAllStaffSerializer, RegisterStaffSerializer, StaffsSerializer, StoreIdSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.views.decorators.http import require_POST
@@ -42,3 +43,19 @@ class GetStoreIdAPIView(APIView):
             return Response(serializer.data)
         except Staff.DoesNotExist:
             return Response({'error': 'Staff instance not found for the given user ID'}, status=status.HTTP_404_NOT_FOUND)
+class StaffByOwnerIdAPIView(APIView):
+    def get(self, request):
+        
+        owner_id = request.user.id
+        store_ids = StoreService.get_store_ids_by_owner(owner_id)   
+        staff_members = StaffService.get_staff_by_store_ids(store_ids)
+        staff_details = []
+        for staff in staff_members:
+            user_id = staff.user.id
+            user = UserService.get_user_by_id(user_id)
+
+            if user:
+                user_serializer = GetAllStaffSerializer(user).data
+                staff_details.append(user_serializer)
+
+        return Response(staff_details, status=status.HTTP_200_OK)

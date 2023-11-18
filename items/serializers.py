@@ -38,3 +38,10 @@ class ItemSocketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = '__all__'
+
+class UpdateItemSerializer(serializers.ModelSerializer):
+    image = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = Item
+        fields = ['id','name','code','description','cost','price','quantity','image']

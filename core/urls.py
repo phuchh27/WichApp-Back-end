@@ -47,4 +47,5 @@ urlpatterns = [
     # path('webhooks/', include('payment.urls')),
     path('items/', include('items.urls')),
     path('bills/', include('bill.urls')),
+    path('socialAuth/', include('social_authentication.urls'))
 ]

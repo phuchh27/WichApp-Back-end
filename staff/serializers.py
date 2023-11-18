@@ -50,3 +50,8 @@ class StaffsSerializer(serializers.ModelSerializer):
 
 class StoreIdSerializer(serializers.Serializer):
     store_id = serializers.IntegerField()
+
+class GetAllStaffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'address', 'phone', 'fullname', 'is_active', 'is_verified', 'created_at']

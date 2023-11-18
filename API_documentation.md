@@ -4,6 +4,12 @@ python manage.py runserver
 daphne core.asgi:application
 
 
+sudo service redis-server start
+redis-cli 
+ping
+KEYS "bill:*" # get all data key bill
+get bill:G9gvchtVN5 # get bill by id
+
 ## Auth API 
 
 ----------------------------------------------------------------
@@ -47,5 +53,4 @@ daphne core.asgi:application
     /stores/{id} - stores_delete
 ### Staffs
 ### Products
-
 ## StoreAdmin
