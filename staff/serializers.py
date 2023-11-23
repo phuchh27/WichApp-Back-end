@@ -6,33 +6,36 @@ from stores.models import Store
 
 
 class RegisterStaffSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=68, min_length=6, write_only=True)
-    
+    password = serializers.CharField(
+        max_length=68, min_length=6, write_only=True)
+
     class Meta:
         model = User
-        fields = ['email', 'username', 'password','phone']
-        
+        fields = ['email', 'username', 'password', 'phone']
+
     def validate(self, attrs):
         email = attrs.get('email', '')
         username = attrs.get('username', '')
         store_id = self.context['view'].kwargs.get('store_id')
-        
+
         if not username.isalnum():
-            raise serializers.ValidationError('The username should only contain alphabetic characters')
-        
+            raise serializers.ValidationError(
+                'The username should only contain alphabetic characters')
+
         try:
             store = Store.objects.get(id=store_id)
             if store.owner != self.context['request'].user:
-                raise serializers.ValidationError('You are not the owner of this store')
+                raise serializers.ValidationError(
+                    'You are not the owner of this store')
         except Store.DoesNotExist:
             raise serializers.ValidationError('Invalid store_id')
-        
+
         return attrs
-    
+
     def create(self, validated_data):
 
         user = User.objects.create_user(**validated_data)
-        user.is_verified=True
+        user.is_verified = True
         user.save()
         store_id = self.context['view'].kwargs.get('store_id')
         try:
@@ -46,12 +49,24 @@ class RegisterStaffSerializer(serializers.ModelSerializer):
 class StaffsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email','phone','is_active')
+        fields = ('username', 'email', 'phone', 'is_active')
+
 
 class StoreIdSerializer(serializers.Serializer):
     store_id = serializers.IntegerField()
 
+
 class GetAllStaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'address', 'phone', 'fullname', 'is_active', 'is_verified', 'created_at']
+        fields = ['id', 'username', 'email', 'address', 'phone',
+                  'fullname', 'is_active', 'is_verified', 'created_at']
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'address', 'phone',
+                  'fullname','is_active']
+
+

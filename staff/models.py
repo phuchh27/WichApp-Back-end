@@ -9,3 +9,4 @@ from stores.models import Store
 class Staff(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    working_status = models.BooleanField(default=True)

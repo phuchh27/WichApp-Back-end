@@ -90,8 +90,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=1),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=15),
 }
 
 CACHES = {
@@ -161,6 +161,8 @@ DATABASES = {
     }
 }
 
+#postgres://wich_app_database_user:XlAKsB5cLmVutf1nb3Qi7I7Pjg0fTNjN@dpg-clfbc2vjc5ks73e5odf0-a.singapore-postgres.render.com/wich_app_database
+# pip install dj-database-url
 
 
 # Password validation

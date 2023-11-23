@@ -22,6 +22,15 @@ def get_store_id(id):
 
 class StaffService:
     @staticmethod
-    def get_staff_by_store_ids(store_ids):
-        staff = Staff.objects.filter(store_id__in=store_ids)
+    def get_staff_by_store_ids(store_ids, working_status=True):
+        staff = Staff.objects.filter(store_id__in=store_ids,working_status = working_status)
         return staff
+    
+    @staticmethod
+    def get_store_id_by_user_id(user_id):
+        try:
+            staff = Staff.objects.get(user_id=user_id)
+            store_id = staff.store_id
+            return store_id
+        except Staff.DoesNotExist:
+            return None

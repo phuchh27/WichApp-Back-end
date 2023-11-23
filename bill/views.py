@@ -130,7 +130,7 @@ class DeleteBillView(APIView):
 
 
 class PayBillView(APIView):
-    def post(self, request, bill_id, *args, **kwargs):
+    def delete(self, request, bill_id, *args, **kwargs):
         # Retrieve data from Redis
         bill_data = get_bill_data_from_redis(bill_id)
         bill_details_data = get_bill_details_data_from_redis(bill_id)
