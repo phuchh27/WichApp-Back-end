@@ -9,6 +9,8 @@ from rest_framework import serializers
 
 from authentication import services
 
+from django.core.validators import MinValueValidator
+
 class ItemSerializer(serializers.ModelSerializer):
     id = serializers.CharField()
     class Meta:
@@ -24,10 +26,11 @@ class BillDetailSerializer(serializers.ModelSerializer):
 
 class BillSerializer(serializers.ModelSerializer):
     bill_details = BillDetailSerializer(many=True, write_only=True)
+    employee_id = serializers.CharField()
 
     class Meta:
         model = Bill
-        fields = ('store_id', 'total_amount', 'bill_details')
+        fields = ('store_id', 'total_amount', 'bill_details', 'employee_id')
 
     
     def create(self, validated_data):
@@ -79,14 +82,24 @@ class BillUpdateSerializer(serializers.Serializer):
 
 
 
-class BillDetailForPaySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BillDetail
-        fields = ['product', 'quantity']
 
-class BillForPaySerializer(serializers.ModelSerializer):
-    bill_details = BillDetailSerializer(many=True)
+class BillDetailPaySerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(validators=[MinValueValidator(1)])
 
-    class Meta:
-        model = Bill
-        fields = ['id', 'date_create', 'date_paid', 'total_amount', 'store', 'employee', 'bill_details']
+class BillPaySerializer(serializers.Serializer):
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    employee_id = serializers.CharField()
+    store_id = serializers.IntegerField()
+    bill_details = BillDetailPaySerializer(many=True)  # Use BillDetailPaySerializer here
+
+    def create(self, validated_data):
+        bill_details_data = validated_data.pop('bill_details')
+        bill = Bill.objects.create(**validated_data)
+
+        for bill_detail_data in bill_details_data:
+            product_id = bill_detail_data.pop('product_id')
+            product = Item.objects.get(id=product_id)
+            BillDetail.objects.create(bill=bill, product=product, **bill_detail_data)
+
+        return bill

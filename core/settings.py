@@ -19,6 +19,8 @@ import json
 
 import stripe
 
+import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -150,6 +152,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #         'PORT': '',
 #     }
 # }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -160,6 +163,8 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+DATABASES ['default'] = dj_database_url.parse("postgres://wich_app_database_user:XlAKsB5cLmVutf1nb3Qi7I7Pjg0fTNjN@dpg-clfbc2vjc5ks73e5odf0-a.singapore-postgres.render.com/wich_app_database")
 
 #postgres://wich_app_database_user:XlAKsB5cLmVutf1nb3Qi7I7Pjg0fTNjN@dpg-clfbc2vjc5ks73e5odf0-a.singapore-postgres.render.com/wich_app_database
 # pip install dj-database-url

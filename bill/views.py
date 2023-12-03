@@ -9,12 +9,13 @@ from rest_framework.views import APIView
 from bill.services import delete_bill_data_from_redis, delete_bill_details_data_from_redis, get_bill_data_from_redis, get_bill_details_data_from_redis
 
 from .models import Bill
-from .serializers import BillDetailForPaySerializer, BillForPaySerializer, BillSerializer ,BillUpdateSerializer
+from .serializers import  BillPaySerializer, BillSerializer, BillUpdateSerializer
 
 from authentication import services
 
 import redis
 import json
+
 
 class BillCreateAPIView(generics.CreateAPIView):
     queryset = Bill.objects.all()
@@ -25,6 +26,7 @@ class BillCreateAPIView(generics.CreateAPIView):
             return Response({'status': 'error', 'message': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
         current_user = self.request.user.id
+        employee_id = request.data.get('employee_id', None)
         isStaff = services.is_user_staff(current_user)
         get_store = services.get_store_id_by_user(current_user)
 
@@ -36,22 +38,27 @@ class BillCreateAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        serializer.save(employee_id=current_user, store_id=get_store)
+        if employee_id:
+            serializer.save(employee_id=employee_id, store_id=get_store)
+        else:
+            serializer.save(employee_id=current_user, store_id=get_store)
 
         return Response({'status': 'success', 'bill_data': serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class BillListByStoreId(APIView):
+    
     def get(self, request, *args, **kwargs):
-       
+
         current_user = self.request.user.id
         user_store_id = services.get_store_id_by_user(current_user)
-      
+
         redis_client = redis.Redis()
         all_keys = redis_client.keys("bill:*")
 
         # 3. Lọc ra các keys phù hợp với store_id
-        matching_keys = [key.decode("utf-8") for key in all_keys if f'StoreId_{user_store_id}' in key.decode("utf-8")]
+        matching_keys = [key.decode(
+            "utf-8") for key in all_keys if f'StoreId_{user_store_id}' in key.decode("utf-8")]
         print(matching_keys)
         # 4. Lấy dữ liệu từ Redis cho những keys quan tâm
         bills = []
@@ -64,7 +71,7 @@ class BillListByStoreId(APIView):
                 bills.append(bill)
         # 5. Trả về dữ liệu dưới dạng JSON
         return Response(bills, status=status.HTTP_200_OK)
-    
+
 
 class BillDetailAPIView(APIView):
     def get(self, request, key, format=None):
@@ -82,7 +89,8 @@ class BillDetailAPIView(APIView):
             return Response(bill_detail, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Bill detail not found'}, status=status.HTTP_404_NOT_FOUND)
-        
+
+
 class UpdateBillView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = BillUpdateSerializer(data=request.data)
@@ -92,35 +100,41 @@ class UpdateBillView(APIView):
             billEditing = serializer.validated_data['billEditing']
             billtotal = serializer.validated_data['billtotal']
 
-            redis_instance = redis.StrictRedis(host='localhost', port=6379, db=0)
+            redis_instance = redis.StrictRedis(
+                host='localhost', port=6379, db=0)
 
             # Retrieve existing bill_detail from Redis
             existing_bill_detail = redis_instance.get(f'bill_detail:{bill_id}')
 
             if existing_bill_detail:
-                existing_bill_detail = json.loads(existing_bill_detail.decode('utf-8'))
+                existing_bill_detail = json.loads(
+                    existing_bill_detail.decode('utf-8'))
 
                 # Update the existing bill_detail in Redis
-                redis_instance.set(f'bill_detail:{bill_id}', json.dumps(billEditing))
+                redis_instance.set(
+                    f'bill_detail:{bill_id}', json.dumps(billEditing))
 
                 # Update total_amount in Redis
                 existing_data = redis_instance.get(f'bill:{bill_id}')
                 if existing_data:
                     existing_data = json.loads(existing_data.decode('utf-8'))
                     existing_data['total_amount'] = str(billtotal)
-                    redis_instance.set(f'bill:{bill_id}', json.dumps(existing_data))
+                    redis_instance.set(
+                        f'bill:{bill_id}', json.dumps(existing_data))
 
                 return Response({"message": "Bill updated successfully"}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Bill not found in Redis"}, status=status.HTTP_404_NOT_FOUND)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class DeleteBillView(APIView):
     def delete(self, request, bill_id, *args, **kwargs):
         try:
-            
-            redis_instance = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+            redis_instance = redis.StrictRedis(
+                host='localhost', port=6379, db=0)
             redis_instance.delete(f'bill_detail:{bill_id}')
             redis_instance.delete(f'bill:{bill_id}')
 
@@ -130,35 +144,42 @@ class DeleteBillView(APIView):
 
 
 class PayBillView(APIView):
-    def delete(self, request, bill_id, *args, **kwargs):
-        # Retrieve data from Redis
-        bill_data = get_bill_data_from_redis(bill_id)
-        bill_details_data = get_bill_details_data_from_redis(bill_id)
-        
-        delete_bill_data_from_redis(bill_id)
-        delete_bill_details_data_from_redis(bill_id)
+    def post(self, request, *args, **kwargs):
+        bill_data = get_bill_data_from_redis(request.data['bill_id'])
+        bill_details_data = get_bill_details_data_from_redis(request.data['bill_id'])
 
-        if not bill_data or not bill_details_data:
-            return Response({"error": "Data not found in Redis"}, status=status.HTTP_404_NOT_FOUND)
+        employee_id = bill_data.get('employee_id', '')
+        employee_id_parts = employee_id.split('_')
+        extracted_employee_id = employee_id_parts[0] if employee_id_parts else None
 
-        # Deserialize the data
-        bill_serializer = BillForPaySerializer(data=bill_data)
-        if bill_serializer.is_valid():
-            # Save Bill to the database
-            bill = bill_serializer.save()
+        bill_data['employee_id'] = extracted_employee_id
 
-            # Save BillDetails to the database
-            bill_details_serializer = BillDetailForPaySerializer(data=bill_details_data, many=True)
-            if bill_details_serializer.is_valid():
-                for bill_detail_data in bill_details_data:
-                    bill_detail_data['bill'] = bill.id
+        modified_bill_details_data = []
+        for bill_detail in bill_details_data:
+            product_data = bill_detail.get('product', {})
+            if not product_data:
+                return Response({"bill_details": [{"product": ["This field is required."]}]}, status=status.HTTP_400_BAD_REQUEST)
 
-                bill_details_serializer.save()
+            product_id = product_data.get('id', None)
+            modified_bill_detail = {
+                'product_id': product_id,  
+                'quantity': bill_detail.get('quantity', 0),
+            }
+            modified_bill_details_data.append(modified_bill_detail)
 
-                # Update date_paid in the Bill model
-                bill.date_paid = timezone.now()
-                bill.save()
+        serializer = BillPaySerializer(data={**bill_data, 'bill_details': modified_bill_details_data})
+        if serializer.is_valid():
+            serializer.save()
+            
+            delete_bill_data_from_redis(request.data['bill_id'])
+            delete_bill_details_data_from_redis(request.data['bill_id'])
 
-                return Response({"message": "Bill paid successfully"}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+

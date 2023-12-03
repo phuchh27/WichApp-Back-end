@@ -146,3 +146,23 @@ class GetItemsByStoreId(ListAPIView):
     def get_queryset(self):
         store_id = self.kwargs['store_id']
         return Item.objects.filter(store_id=store_id)
+    
+
+class ItemCategoryListCreateAPIView(ListCreateAPIView):
+    serializer_class = ItemCategorySerializer 
+
+    def get_queryset(self):
+        store_id = self.kwargs.get('store_id')
+        return ItemCategory.objects.filter(store__id=store_id)
+
+    def perform_create(self, serializer):
+        store_id = self.kwargs.get('store_id')
+        store = Store.objects.get(id=store_id)
+        serializer.save(store=store)
+
+class ItemCategoryRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = ItemCategorySerializer
+
+    def get_queryset(self):
+        store_id = self.kwargs.get('store_id')
+        return ItemCategory.objects.filter(store__id=store_id)

@@ -8,7 +8,7 @@ class ItemSerializer(serializers.ModelSerializer):
     image = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = Item
-        fields = ['id','name','code','description','cost','price','quantity','image', 'image_link']
+        fields = ['category','id','name','code','description','cost','price','quantity','image', 'image_link']
     def validate(self, attrs):
         store_id = self.context['view'].kwargs.get('store_id')
         store = get_object_or_404(Store, id=store_id)
@@ -45,3 +45,8 @@ class UpdateItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id','name','code','description','cost','price','quantity','image']
+
+class ItemCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemCategory
+        fields = ['id', 'name', 'store']

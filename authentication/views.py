@@ -3,13 +3,16 @@ from django.shortcuts import render
 from django.contrib.sites.shortcuts import  get_current_site
 from django.urls import reverse
 from django.conf import settings
+import redis
 #import rest_framework library
 from rest_framework import generics,status,views
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 import jwt
+
+from authentication.services import get_store_id_by_user
 #import inside project
-from .serializers import RegisterSerializer , EmailVerificationSerializer ,LoginSerializer,LogoutSerializer
+from .serializers import LoginStaffSerializer, RegisterSerializer , EmailVerificationSerializer ,LoginSerializer,LogoutSerializer
 from.models import User
 from .utils import Util
 
@@ -17,6 +20,9 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from urllib.parse import unquote
 from rest_framework import permissions
+
+from rest_framework.views import APIView
+import json
 # Create your views here.
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -71,6 +77,13 @@ class LoginAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class LoginStaffAPIView(generics.GenericAPIView):
+    serializer_class = LoginStaffSerializer
+    def post(self, request):
+        serializer = self.serializer_class(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class LogOutAPIView(generics.GenericAPIView):
     serializer_class = LogoutSerializer
@@ -80,3 +93,26 @@ class LogOutAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+
+class onlineStaffsAPIView(APIView):
+    def get(self, request):
+        user = self.request.user.id
+        user_store_id = get_store_id_by_user(user)
+
+        redis_client = redis.Redis()
+        all_keys = redis_client.keys("staff:*")
+
+        matching_keys = [key.decode(
+            "utf-8") for key in all_keys if f'StoreId_{user_store_id}' in key.decode("utf-8")]
+        print(matching_keys)
+
+        staffs = []
+        for key in matching_keys:
+            staff_json = redis_client.get(key)
+            if staff_json is not None:
+                id_part = key.split(':')[1]
+                staff = json.loads(staff_json)
+                staff['id'] = id_part
+                staffs.append(staff)
+        
+        return Response(staffs, status=status.HTTP_200_OK)

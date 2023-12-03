@@ -28,3 +28,4 @@ class Item(models.Model):
             indexes = [
                 models.Index(fields=['is_block']),
             ]
+

@@ -27,7 +27,6 @@ class StoresAPIView(CreateAPIView):
     queryset = Store.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     
-
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         count_of_stores = Store.objects.filter(owner=self.request.user).count()
@@ -36,15 +35,19 @@ class StoresAPIView(CreateAPIView):
             return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_403_FORBIDDEN)
         elif self.request.user.is_staff:
             return Response({"detail": "You do not have permission to create a store."}, status=status.HTTP_403_FORBIDDEN)
-        if count_of_stores >= 1:
-            payment_link = create_payment_session(self.request.user)
-            return Response(
-                {"detail": "You already have a store. You need to pay a cost to create a new store.", "status": 402,"payment_link": payment_link},
-                status=status.HTTP_200_OK
-            )
+
+        if serializer.is_valid():  # Check if the serializer data is valid
+            if count_of_stores >= 1:
+                payment_link = create_payment_session(self.request.user)
+                return Response(
+                    {"detail": "You already have a store. You need to pay a cost to create a new store.", "status": 402,"payment_link": payment_link},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                serializer.save(owner=self.request.user)
+                return Response({"detail": "Store created successfully."}, status=status.HTTP_201_CREATED)
         else:
-            serializer.save(owner=self.request.user)
-            return Response({"detail": "Store created successfully."}, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StoresPayAPIView(CreateAPIView):
