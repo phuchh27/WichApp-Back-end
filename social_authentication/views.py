@@ -6,7 +6,7 @@ from rest_framework import status
 
 from .serializers import GoogleSocialAuthSerializer
 
-# Create your views here.
+
 class GoogleSocialAuthView(GenericAPIView):
     serializer_class = GoogleSocialAuthSerializer
 
