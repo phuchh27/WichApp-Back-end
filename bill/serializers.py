@@ -103,3 +103,25 @@ class BillPaySerializer(serializers.Serializer):
             BillDetail.objects.create(bill=bill, product=product, **bill_detail_data)
 
         return bill
+    
+
+class BillWithProfitSerializer(serializers.Serializer):
+    bill_id = serializers.CharField()
+    date_create = serializers.DateTimeField()
+    date_paid = serializers.DateTimeField(allow_null=True)
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    store_id = serializers.IntegerField()
+    employee_name = serializers.CharField()
+    total_profit = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+class ProductSerializerForBillDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ['name', 'price', 'image_link']
+
+class BillDetailOwnerSerializer(serializers.ModelSerializer):
+    product = ProductSerializerForBillDetailSerializer()
+
+    class Meta:
+        model = BillDetail
+        fields = ['product','quantity']

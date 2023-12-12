@@ -6,10 +6,10 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 
-from bill.services import delete_bill_data_from_redis, delete_bill_details_data_from_redis, get_bill_data_from_redis, get_bill_details_data_from_redis
+from bill.services import delete_bill_data_from_redis, delete_bill_details_data_from_redis, get_bill_data_from_redis, get_bill_details_data_from_redis, get_bills_and_profits_by_store_id
 
-from .models import Bill
-from .serializers import  BillPaySerializer, BillSerializer, BillUpdateSerializer
+from .models import Bill, BillDetail
+from .serializers import  BillDetailOwnerSerializer, BillPaySerializer, BillSerializer, BillUpdateSerializer, BillWithProfitSerializer
 
 from authentication import services
 
@@ -179,7 +179,18 @@ class PayBillView(APIView):
 
 
 
+class StoreBillProfitView(APIView):
+    def get(self, request, store_id):
+        bills_with_profits = get_bills_and_profits_by_store_id(store_id)
+        serializer = BillWithProfitSerializer(bills_with_profits, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-
+class BillProductListView(APIView):
+    def get(self, request, bill_id):
+        try:
+            bill_details = BillDetail.objects.filter(bill_id=bill_id)
+            serializer = BillDetailOwnerSerializer(bill_details, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except BillDetail.DoesNotExist:
+            return Response({"error": "Bill not found"}, status=status.HTTP_404_NOT_FOUND)
 
